@@ -53,7 +53,7 @@ The dataset is globally clean. Nine issues require an explicit decision; none of
 
 The pair `(review_id, order_id)` is unique, so the table's real grain is *one review answer per order*, not *one review per order*.
 
-**Action.** Stage 5: declare `PRIMARY KEY (review_id, order_id)` on `core.order_reviews`. Stage 6 and 8: any analysis or ML feature that requires *one satisfaction score per order* must deduplicate explicitly — see [section 4.7](#47-several-reviews-for-the-same-order).
+**Action.** Stage 5: declare `PRIMARY KEY (review_id, order_id)` on `core.order_reviews`. Stage 6 and 8: any analysis or ML feature that requires *one satisfaction score per order* must deduplicate explicitly — see [section 4.7](#47-several-reviews-for-the-same-order--547-orders).
 
 ### 1.2 `geolocation` — no primary key
 
@@ -129,7 +129,7 @@ VALUES
 | `order_delivered_carrier_date` | 1,783 | 1.793% |
 | `order_delivered_customer_date` | 2,965 | 2.982% |
 
-**Interpretation.** These NULLs are **legitimate and informative**: they encode the order lifecycle stage. An order that is `canceled`, `processing` or `shipped` has genuinely never reached the delivery step. The increasing volume along the funnel (160 → 1,783 → 2,965) is consistent with orders dropping out at each stage. Cross-checking against `order_status` confirms the pattern, with one exception documented in [section 4.4](#44-delivered-orders-with-no-delivery-date).
+**Interpretation.** These NULLs are **legitimate and informative**: they encode the order lifecycle stage. An order that is `canceled`, `processing` or `shipped` has genuinely never reached the delivery step. The increasing volume along the funnel (160 → 1,783 → 2,965) is consistent with orders dropping out at each stage. Cross-checking against `order_status` confirms the pattern, with one exception documented in [section 4.4](#44-delivered-orders-with-no-delivery-date--8-rows).
 
 **Why this check matters** (it produces three concrete decisions):
 1. These three columns **must remain nullable** in `core.orders` — a `NOT NULL` constraint would reject 3% of valid orders.
