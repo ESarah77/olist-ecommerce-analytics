@@ -1,6 +1,5 @@
 -- Staging layer: raw data loaded as-is from CSV files.
--- All columns are TEXT on purpose: typing, constraints and cleaning
--- are handled downstream in the ETL layer.
+-- All columns are TEXT on purpose: typing, constraints and cleaning are handled downstream in the core and ETL layer.
 
 CREATE SCHEMA IF NOT EXISTS staging;
 
