@@ -266,6 +266,13 @@ ORDER BY order_id, review_answer_timestamp DESC, review_id;
 
 **Action.** Row kept. Since revenue is computed from `order_items` (see 4.5), this order contributes correctly to commercial analyses. Only payment-type analyses exclude it naturally, as it has no payment row to join. Documented; no treatment.
 
+
+### 4.9 Coordinates outside of Brazil
+
+**Interpretation.** 10 raw geolocation points (0.05% of distinct zip prefixes) fall outside Brazil's bounding box.
+
+**Action.** Excluded from the centroid calculation during the ETL rather than corrected, since the true coordinate cannot be recovered.
+
 ---
 
 ## 5. Exact duplicates
