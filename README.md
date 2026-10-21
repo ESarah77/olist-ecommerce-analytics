@@ -333,7 +333,7 @@ A 3-page interactive dashboard built on top of the PostgreSQL `core` schema, tur
 ![Logistics and satisfaction page](powerbi/screenshots/02_logistics_satisfaction.png)
 ![Customers and sellers page](powerbi/screenshots/03_customers_sellers.png)
 
-**Approach**: business rules stay in SQL (view [`reporting.orders_enriched`](sql/reporting/orders_enriched.sql)), DAX is used for measures that must react to filters, and the model is kept to a star-like schema around the order items to avoid double counting. The data model, the measure dictionary and the design decisions are documented in [`docs/powerbi_documentation.md`](docs/powerbi_documentation.md).
+**Approach**: business rules stay in SQL (view [`reporting.orders_enriched`](sql/reporting/orders_enriched.sql)), DAX is used for measures that must react to filters, and the model is kept to a star-like schema around the order items to avoid double counting. The data model, the measure dictionary and the design decisions are documented in [`docs/08b_powerbi_documentation.md`](docs/08b_powerbi_documentation.md).
 
 **Open the dashboard**: [`powerbi/olist_dashboard.pbix`](powerbi/olist_dashboard.pbix) requires Power BI Desktop (Windows). The data is embedded (Import mode), so the file opens without a database.
 
