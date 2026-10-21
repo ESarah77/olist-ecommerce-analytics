@@ -21,6 +21,7 @@
     - [Data Model (Entity-Relationship Diagram)](#data-model-entity-relationship-diagram)
     - [Data Quality & ETL](#data-quality--etl)
     - [Business Analyses](#business-analyses)
+    - [Power BI Dashboard](#power-bi-dashboard)
     - [Machine Learning: Predicting Customer Dissatisfaction](#machine-learning-predicting-customer-dissatisfaction)
 - [Limitations & Possible Next Steps](#limitations--possible-next-steps)
 - [License](#license)
@@ -47,7 +48,14 @@ The full pipeline is built and documented in 9 stages: data exploration, data qu
 │   └── raw/                                # ignored by git — populated by scripts/download_data.py
 ├── docs/
 │   ├── 03_exploration_notes.md             # ignored by git — personal working notes
-│   └── 04_data_quality.md                  # data quality audit (stage 4)
+│   ├── 04_data_quality.md                  # data quality audit (stage 4)
+│   └── powerbi_documentation.md            # Power BI model, measures and validation
+├── powerbi/
+│   ├── olist_dashboard.pbix                # Power BI dashboard (Windows, Power BI Desktop)
+│   └── screenshots/
+│       ├── 01_commerce.png
+│       ├── 02_logistics_satisfaction.png
+│       └── 03_customers_sellers.png
 ├── notebooks/
 │   └── dissatisfaction_model.ipynb         # ML notebook (stage 8)
 ├── scripts/
@@ -81,6 +89,8 @@ The full pipeline is built and documented in 9 stages: data exploration, data qu
 │   │   ├── 08_avg_review_score_by_category.sql
 │   │   ├── 09_seller_ratings_best_worst.sql
 │   │   └── 10_basket_value_distribution.sql
+│   ├── reporting/
+│   │   └── orders_enriched.sql             # reporting view used by Power BI
 │   └── ml/
 │       └── 08_dissatisfaction_features_view.sql
 ├── .gitignore
@@ -103,6 +113,7 @@ The full pipeline is built and documented in 9 stages: data exploration, data qu
 
 - **Database**: PostgreSQL, with a normalized relational schema (`staging` → `core`)
 - **SQL**: CTEs, window functions (`LAG`, `SUM() OVER()`, `NTILE`, `ROW_NUMBER`), `CHECK`/FK constraints, views
+- **BI**: Power BI Desktop (data modeling, DAX measures, interactive reporting)
 - **Python**: pandas, scikit-learn, matplotlib, psycopg2, Jupyter
 - **Tooling**: [uv](https://docs.astral.sh/uv/) for Python environment and dependency management
 
@@ -180,6 +191,7 @@ Edit the database connection details in the notebook's second cell with your own
 | — | Post-ETL validation: row-count consistency, regression checks against the audit's documented figures | [`sql/tests/validate_core.sql`](sql/tests/validate_core.sql) |
 | 7 | 10 SQL business analyses across 4 themes (commercial performance, logistics, customers, sellers/satisfaction) | [`sql/analysis/`](sql/analysis/) |
 | 8 | Feature engineering (leakage-safe SQL view) + ML: predicting customer dissatisfaction | [`sql/ml/08_dissatisfaction_features_view.sql`](sql/ml/08_dissatisfaction_features_view.sql), [`notebooks/dissatisfaction_model.ipynb`](notebooks/dissatisfaction_model.ipynb) |
+| 8b | Power BI dashboard: reporting view, data model, DAX measures, 3 report pages | [`sql/reporting/`](sql/reporting/), [`powerbi/`](powerbi/) |
 | 9 | Documentation | this file |
 
 ### Data Model (Entity-Relationship Diagram)
@@ -307,6 +319,24 @@ Every data quality decision — what was found, how it was measured, and what th
 
 **Note on query 05**: growth-rate figures at the very start (Nov 2016 has zero orders — a pre-launch pilot phase) and end (Sep 2018 is a partial month) of the series are statistical artifacts of a near-zero denominator, not real business swings. The trend should be read over the Jan 2017–Aug 2018 window.
 
+### Power BI Dashboard
+
+A 3-page interactive dashboard built on top of the PostgreSQL `core` schema, turning the SQL analyses into KPIs that a business team can explore with filters. Every figure was reconciled against the SQL reference results (see the [validation table](docs/08b_powerbi_documentation.md#5-validation-against-the-sql-reference)).
+
+| Page | What it answers |
+|---|---|
+| **Commerce** | How much revenue does Olist generate, how is it evolving month by month, and which categories drive it? (revenue, orders, average basket, top 10 categories = 62.3% of revenue) |
+| **Logistics & satisfaction** | Are deliveries on time, where are they late, and what does lateness cost in satisfaction? (late-delivery rate by state, dissatisfaction 65.4% for late orders vs 17.2% on time, actual vs estimated delivery time) |
+| **Customers & sellers** | How loyal are customers, and where does satisfaction break down? (3.12% recurring customers, review score by category, best and worst rated sellers with a minimum volume) |
+
+![Commerce page](powerbi/screenshots/01_commerce.png)
+![Logistics and satisfaction page](powerbi/screenshots/02_logistics_satisfaction.png)
+![Customers and sellers page](powerbi/screenshots/03_customers_sellers.png)
+
+**Approach**: business rules stay in SQL (view [`reporting.orders_enriched`](sql/reporting/orders_enriched.sql)), DAX is used for measures that must react to filters, and the model is kept to a star-like schema around the order items to avoid double counting. The data model, the measure dictionary and the design decisions are documented in [`docs/powerbi_documentation.md`](docs/powerbi_documentation.md).
+
+**Open the dashboard**: [`powerbi/olist_dashboard.pbix`](powerbi/olist_dashboard.pbix) requires Power BI Desktop (Windows). The data is embedded (Import mode), so the file opens without a database.
+
 ### Machine Learning: Predicting Customer Dissatisfaction
 
 **Problem**: predict whether a customer will be dissatisfied (`review_score ≤ 3`) or satisfied (`review_score ≥ 4`), using only order and delivery characteristics available before a review could be left — directly testing the hypothesis from business analysis #02.
@@ -340,4 +370,4 @@ Every data quality decision — what was found, how it was measured, and what th
 
 The **source code** in this repository is licensed under the **MIT License** — see the `LICENSE` file.
 
-The **dataset** (`olist_customers_dataset.csv`, `olist_geolocation_dataset.csv`, `olist_order_items_dataset.csv`, `olist_order_payments_dataset.csv`, `olist_order_reviews_dataset.csv`, `olist_orders_dataset.csv`, `olist_products_dataset.csv`, `olist_sellers_dataset.csv`, `product_category_name_translation.csv`,) is **not** part of this repository and is **not** redistributed here. It is provided by Kaggle under its own license terms; please review the dataset page on Kaggle before using it. By downloading the dataset through `scripts/download_data.py`, you agree to the Kaggle terms of use.
+The **dataset** is the [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce), provided by Olist and licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). The raw CSV files are not redistributed in this repository. The Power BI file `powerbi/olist_dashboard.pbix` embeds a transformed subset of the data (cleaned, joined and aggregated; review comments, payments and geolocation are not included) and is therefore shared under the same CC BY-NC-SA 4.0 license. This project is for educational and portfolio purposes only.
