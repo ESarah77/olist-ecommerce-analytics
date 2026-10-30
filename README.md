@@ -1,13 +1,25 @@
 # Olist E-Commerce Analytics
 
-**From raw, imperfect e-commerce data to a documented relational database, business insights, and a machine learning model — a self-contained SQL and Data Analytics portfolio project.**
+**Context.** Olist is a Brazilian e-commerce marketplace. This project turns ~100k real orders (2016–2018) into a clean PostgreSQL database, SQL analyses, an interactive Power BI dashboard and a small ML model, simulating a data analyst's work on a marketplace's data.
+
+**Business question.** Does delivery reliability drive customer dissatisfaction, and where should the company act first?
+
+**Main results.**
+- Orders arrive in 12.5 days on average against a 24.4-day estimate, and 91.9% arrive on time or early.
+- Yet late orders score 2.57/5 versus 4.29/5 for on-time ones: 65.4% of late orders end in a dissatisfied review, versus 17.2% on time.
+- Late-delivery rates range from 2.9% (Rondônia) to 23.9% (Alagoas), with the North/Northeast the worst.
+- Only 3.12% of customers order again, so a bad first experience is costly.
+- A Gradient Boosting model (ROC-AUC ≈ 0.70) points the same way: delay-related features account for over 65% of feature importance.
+
+**Recommendation.** Prioritize delivery reliability in the states with the highest late rates (Alagoas 23.9%, Maranhão 19.7%, Piauí 16.0%), for instance through carrier SLAs and regional fulfillment. Delay is the strongest predictor of dissatisfaction found in this analysis, and satisfaction matters most for a business that depends on acquiring new customers.
+
+*Built end to end with PostgreSQL, SQL (CTEs, window functions), Power BI (DAX) and Python (scikit-learn).*
 
 ## Table of Contents
 
 - [Business Context](#business-context)
 - [Data Source](#data-source)
 - [Repository Structure](#repository-structure)
-- [Key Findings](#key-findings)
 - [Tech Stack](#tech-stack)
 - [Quickstart](#quickstart)
     - [Requirements](#requirements)
@@ -100,14 +112,6 @@ The full pipeline is built and documented in 9 stages: data exploration, data qu
 ├── uv.lock
 └── README.md
 ```
-
-## Key Findings
-
-- **Olist significantly over-promises on delivery time.** Actual delivery averages **12.5 days** against a **24.4-day estimate** — 91.9% of orders arrive on time or early.
-- **Late delivery is strongly linked to dissatisfaction.** Late orders average a **2.57/5** review score versus **4.29/5** for on-time orders; **65.4%** of late orders receive a dissatisfied score (≤3) versus 17.2% for on-time orders.
-- **Olist is an acquisition-driven business, not a retention-driven one.** Only **3.12%** of customers place more than one order.
-- **Late-delivery rates vary sharply by region**, from 23.9% in Alagoas (AL) to 2.9% in Rondônia (RO) — the North/Northeast is consistently underserved relative to the Southeast.
-- **A machine learning model confirms the delivery-delay hypothesis at the feature level, not just descriptively**: `is_late` and `actual_delivery_days` together account for **more than 65% of feature importance** in a Gradient Boosting classifier predicting dissatisfaction.
 
 ## Tech Stack
 
